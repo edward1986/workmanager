@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.work.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,7 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         button.setOnClickListener {
-            setOneTimeWorkRequest()
+            //setOneTimeWorkRequest()
+            setPeriodicWorkRequest()
         }
     }
 
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             .build()
         val constraints = Constraints.Builder()
             .setRequiresCharging(true)
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val uploadRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java)
@@ -63,5 +66,12 @@ class MainActivity : AppCompatActivity() {
             })
 
 
+    }
+
+    private fun setPeriodicWorkRequest(){
+       val periodicWorkRequest = PeriodicWorkRequest
+           .Builder(DownloadingWorker::class.java,16,TimeUnit.MINUTES)
+           .build()
+      WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
     }
 }
